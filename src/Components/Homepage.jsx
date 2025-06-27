@@ -123,7 +123,6 @@ function Homepage() {
             .catch(err => console.error("Error updating subject:", err));
     };
 
-
     const handleDelete = (id, category) => {
         axios.delete(`http://localhost:8080/api/subjects/${id}`)
             .then(() => {
