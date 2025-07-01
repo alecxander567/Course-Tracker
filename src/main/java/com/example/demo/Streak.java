@@ -1,9 +1,6 @@
 package com.example.demo;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
+import jakarta.persistence.*;
 import java.time.LocalDate;
 
 @Entity
@@ -13,16 +10,21 @@ public class Streak {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String userId;
+    @ManyToOne
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    private User user;
+
     private int currentStreak;
     private int weeklyStreak;
     private LocalDate lastVisit;
 
+    public Streak() {}
+
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
-    public String getUserId() { return userId; }
-    public void setUserId(String userId) { this.userId = userId; }
+    public User getUser() { return user; }
+    public void setUser(User user) { this.user = user; }
 
     public int getCurrentStreak() { return currentStreak; }
     public void setCurrentStreak(int currentStreak) { this.currentStreak = currentStreak; }

@@ -10,33 +10,47 @@ import java.util.Optional;
 
 @Service
 public class StreakService {
+
     @Autowired
     private StreakRepository streakRepository;
 
-    public Streak updateStreak(String userId) {
-        Streak streak = streakRepository.findByUserId(userId)
-                .orElseGet(() -> {
-                    Streak s = new Streak();
-                    s.setUserId(userId);
-                    s.setCurrentStreak(0);
-                    s.setWeeklyStreak(0);
-                    s.setLastVisit(LocalDate.now().minusDays(1));
-                    return s;
-                });
+    @Autowired
+    private UserRepository userRepository;
+
+    public Streak updateStreak(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        Optional<Streak> optionalStreak = streakRepository.findByUser(user);
+
+        Streak streak = optionalStreak.orElseGet(() -> {
+            Streak s = new Streak();
+            s.setUser(user);
+            s.setCurrentStreak(1);
+            s.setWeeklyStreak(1);
+            s.setLastVisit(LocalDate.now());
+            return s;
+        });
 
         LocalDate today = LocalDate.now();
         LocalDate lastVisit = streak.getLastVisit();
+
+        if (lastVisit == null) lastVisit = today.minusDays(1);
+
         long diff = ChronoUnit.DAYS.between(lastVisit, today);
 
-        if (diff == 1) {
+        if (diff == 0) {
+            return streak;
+        } else if (diff == 1) {
             streak.setCurrentStreak(streak.getCurrentStreak() + 1);
             streak.setWeeklyStreak(streak.getWeeklyStreak() + 1);
-        } else if (diff > 1) {
+        } else {
             streak.setCurrentStreak(1);
             streak.setWeeklyStreak(1);
         }
 
-        if (today.getDayOfWeek() == DayOfWeek.MONDAY) {
+        if (today.getDayOfWeek() == DayOfWeek.MONDAY &&
+                lastVisit.getDayOfWeek() != DayOfWeek.SUNDAY) {
             streak.setWeeklyStreak(1);
         }
 
@@ -44,7 +58,9 @@ public class StreakService {
         return streakRepository.save(streak);
     }
 
-    public Optional<Streak> getStreak(String userId) {
-        return streakRepository.findByUserId(userId);
+    public Optional<Streak> getStreak(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        return streakRepository.findByUser(user);
     }
 }

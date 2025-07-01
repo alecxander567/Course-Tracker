@@ -11,16 +11,17 @@ public class StreakController {
     private StreakService streakService;
 
     @GetMapping("/{userId}")
-    public ResponseEntity<Streak> getStreak(@PathVariable String userId) {
+    public ResponseEntity<Streak> getStreak(@PathVariable Long userId) {
         return streakService.getStreak(userId)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping("/{userId}")
-    public ResponseEntity<Streak> updateStreak(@PathVariable String userId) {
+    public ResponseEntity<Streak> updateStreak(@PathVariable Long userId) {
         Streak updated = streakService.updateStreak(userId);
         return ResponseEntity.ok(updated);
     }
+
 }
 
