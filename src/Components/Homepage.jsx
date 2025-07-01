@@ -176,21 +176,33 @@ function Homepage() {
         suggestion: careerSuggestions[category]?.[0] || "No suggestion available"
     }));
 
-   useEffect(() => {
-    const userId = localStorage.getItem("userId") || "myUser123";
+  useEffect(() => {
+        localStorage.setItem("userId", "1");
+        const userId = localStorage.getItem("userId"); 
+        const lastVisit = localStorage.getItem("lastVisit");
+        const today = new Date().toISOString().slice(0, 10);
 
-    axios.post(`http://localhost:8080/api/streak/${userId}`)
-            .then(response => {
-            const data = response.data;
-            setStreak(data.currentStreak);
-            setWeekStreak(data.weeklyStreak);
-            localStorage.setItem("streak", data.currentStreak.toString());
-            localStorage.setItem("weekStreak", data.weeklyStreak.toString());
-            localStorage.setItem("lastVisit", new Date(data.lastVisit).toString());
-        })
-            .catch(error => {
-            console.error("Failed to update streak:", error);
-        });
+        if (lastVisit !== today) {
+            axios.post(`http://localhost:8080/api/streak/${userId}`)
+                .then(response => {
+                    const data = response.data;
+                    console.log("🔥 API Response:", data);
+
+                    setStreak(data.currentStreak);
+                    setWeekStreak(data.weeklyStreak);
+                    localStorage.setItem("streak", data.currentStreak.toString());
+                    localStorage.setItem("weekStreak", data.weeklyStreak.toString());
+                    localStorage.setItem("lastVisit", data.lastVisit);
+                })
+                .catch(error => {
+                    console.error("Failed to update streak:", error);
+                });
+        } else {
+            const savedStreak = localStorage.getItem("streak");
+            const savedWeekStreak = localStorage.getItem("weekStreak");
+            if (savedStreak) setStreak(parseInt(savedStreak));
+            if (savedWeekStreak) setWeekStreak(parseInt(savedWeekStreak));
+        }
     }, []);
 
     const handleLogout = async () => {
@@ -202,7 +214,6 @@ function Homepage() {
             console.error("Logout failed:", error.response?.data || error.message);
         }
     };
-
 
     return (
         <div className="d-flex">
