@@ -9,9 +9,12 @@ public class Course {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(columnDefinition = "LONGTEXT")
     private String name;
-    @Column(columnDefinition = "TEXT")
+
+    @Column(columnDefinition = "LONGTEXT")
     private String note;
+
     private int yearLevel;
 
     public Long getId() {

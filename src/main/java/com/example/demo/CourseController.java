@@ -26,7 +26,9 @@ public class CourseController {
     public Course updateNote(@PathVariable Long id, @RequestBody Course updatedCourse) {
         Course course = courseRepository.findById(id).orElse(null);
         if (course != null) {
+            course.setName(updatedCourse.getName());
             course.setNote(updatedCourse.getNote());
+            course.setYearLevel(updatedCourse.getYearLevel());
             return courseRepository.save(course);
         } else {
             return null;
